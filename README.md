@@ -96,6 +96,8 @@ Approximates the future and past energy functions for a one-dimensional model pr
     primaryClass={math.OC}
   }
 ```
+
+```
   @misc{borggaard2019quadraticquadratic,
     title={The Quadratic-Quadratic Regulator Problem: 
      Approximating feedback controls for quadratic-in-state nonlinear systems},
