@@ -79,37 +79,10 @@ Efficiently computes the product of a special Kronecker sum matrix (aka an N-Way
 
 ## Examples
 
-### example01.m
+### Example01.m
 
-Solves the control problem for randomly generated systems.  Some systems are nearly uncontrollable, others have near zero coefficients, so relative errors could be large.
+Approximates the future and past energy functions for a one-dimensional model problem motivated by the literature.  This appears as example 1 in Kramer, Borggaard, and Gugercin.
 
-### example02.m
-
-Solves a control problem using a discretization of the 1-dimensional Burgers equation (found in the included Burgers1DControl directory).  The control inputs are spatially distributed uniform sources.
-
-### example03.m 
-
-Similar to example1.m, except we force A to be negative-definite, symmetric.
-
-### example04.m
-
-Compare feedback strategies for the Lorenz system.
-
-### example05.m
-
-Similar to example2.m, except we consider a linear reaction term and use a better change-of-variables to convert the discretized system to an explicit system of controlled differential equations.
-
-### example06.m
-
-A simple first-order system where we can investigate convergence of the value function (by plotting it).
-
-### example07.m
-
-A first order cubic control system introduced in Sakamoto and van der Schaft, 2007.
-
-### example08.m
-
-A ring of van der Pol oscillators.  This example can generate arbitrarily large systems of cubic equations.  The region of attraction varies with the degree of feedback control.
 
 
 ### References
