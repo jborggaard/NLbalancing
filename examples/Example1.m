@@ -16,18 +16,18 @@ function [] = Example1()
                   % since eta = 1 - 1/gamma^2;
 
     %  Compute the polynomial approximations to the future energy function
-    [v] = solveFutureEnergy(A,N,B,C,eta,8);
-    v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
+    [w] = solveFutureEnergy(A,N,B,C,eta,8);
+    w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
     x = linspace(-5,5,101);
     
-    Ef2 =       v2*x.^2;
-    Ef3 = Ef2 + v3*x.^3;
-    Ef4 = Ef3 + v4*x.^4;
-    Ef5 = Ef4 + v5*x.^5;
-    Ef6 = Ef5 + v6*x.^6;
-    Ef7 = Ef6 + v7*x.^7;
-    Ef8 = Ef7 + v8*x.^8;
+    Ef2 =       w2*x.^2;
+    Ef3 = Ef2 + w3*x.^3;
+    Ef4 = Ef3 + w4*x.^4;
+    Ef5 = Ef4 + w5*x.^5;
+    Ef6 = Ef5 + w6*x.^6;
+    Ef7 = Ef6 + w7*x.^7;
+    Ef8 = Ef7 + w8*x.^8;
     
     %  Compute the analytical solution for comparison
     EPlusAnalytic = EgammaPlus(x,A,B,C,N,eta);
@@ -55,18 +55,18 @@ function [] = Example1()
 
 
     %  Compute the polynomial approximations to the past energy function
-    [w] = solvePastEnergy(A,N,B,C,eta,8);
-    w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
+    [v] = solvePastEnergy(A,N,B,C,eta,8);
+    v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 
     x = linspace(-5,5,101);
     
-    Ep2 =       w2*x.^2;
-    Ep3 = Ep2 + w3*x.^3;
-    Ep4 = Ep3 + w4*x.^4;
-    Ep5 = Ep4 + w5*x.^5;
-    Ep6 = Ep5 + w6*x.^6;
-    Ep7 = Ep6 + w7*x.^7;
-    Ep8 = Ep7 + w8*x.^8;
+    Ep2 =       v2*x.^2;
+    Ep3 = Ep2 + v3*x.^3;
+    Ep4 = Ep3 + v4*x.^4;
+    Ep5 = Ep4 + v5*x.^5;
+    Ep6 = Ep5 + v6*x.^6;
+    Ep7 = Ep6 + v7*x.^7;
+    Ep8 = Ep7 + v8*x.^8;
 
     %  Compute the analytical solution for comparison
     EMinusAnalytic = EgammaMinus(x,A,B,C,N,eta);
