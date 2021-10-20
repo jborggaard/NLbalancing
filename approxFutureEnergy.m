@@ -1,8 +1,8 @@
-function [w] = solveFutureEnergy(A,N,B,C,eta,d)
+function [w] = approxFutureEnergy(A,N,B,C,eta,d)
 %  Calculates a polynomial approximation to the future energy function
 %  for a quadratic system.
 %
-%  w = solveFutureEnergy(A,N,B,C,eta,d) 
+%  w = approxFutureEnergy(A,N,B,C,eta,d) 
 %
 %  Computes a degree d polynomial approximation to the future energy function 
 %
@@ -44,15 +44,15 @@ function [w] = solveFutureEnergy(A,N,B,C,eta,d)
   if ( eta>0 )
     [W2] = icare(A,B,(C.'*C),R);
     if ( isempty(W2) )
-      warning('solveFutureEnergy: icare couldn''t find stabilizing solution')
+      warning('approxFutureEnergy: icare couldn''t find stabilizing solution')
     end
     
   elseif ( eta<0 )
     [W2] = icare(A,B,(C.'*C),R,'anti');
     
     if ( isempty(W2) )
-      warning('solveFutureEnergy: icare couldn''t find stabilizing solution')
-      warning('solveFutureEnergy: using the hamiltonian')
+      warning('approxFutureEnergy: icare couldn''t find stabilizing solution')
+      warning('approxFutureEnergy: using the hamiltonian')
       [~,W2,~] = hamiltonian(A,B,C.'*C,R,true);
     end
     
@@ -156,6 +156,6 @@ function [w] = solveFutureEnergy(A,N,B,C,eta,d)
   end
   
   if ( d>8 )
-    warning('solveFutureEnergy: monomial terms past degree 8 are not computed')
+    warning('approxFutureEnergy: monomial terms past degree 8 are not computed')
   end
 end

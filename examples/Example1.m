@@ -16,7 +16,7 @@ function [] = Example1()
                   % since eta = 1 - 1/gamma^2;
 
     %  Compute the polynomial approximations to the future energy function
-    [w] = solveFutureEnergy(A,N,B,C,eta,8);
+    [w] = approxFutureEnergy(A,N,B,C,eta,8);
     w2 = w{2}; w3 = w{3}; w4 = w{4}; w5 = w{5}; w6 = w{6}; w7 = w{7}; w8 = w{8};
 
     x = linspace(-5,5,101);
@@ -55,7 +55,7 @@ function [] = Example1()
 
 
     %  Compute the polynomial approximations to the past energy function
-    [v] = solvePastEnergy(A,N,B,C,eta,8);
+    [v] = approxPastEnergy(A,N,B,C,eta,8);
     v2 = v{2}; v3 = v{3}; v4 = v{4}; v5 = v{5}; v6 = v{6}; v7 = v{7}; v8 = v{8};
 
     x = linspace(-5,5,101);

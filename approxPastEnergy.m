@@ -1,8 +1,8 @@
-function [v] = solvePastEnergy(A,N,B,C,eta,d)
+function [v] = approxPastEnergy(A,N,B,C,eta,d)
 %  Calculates a polynomial approximation to the past energy function
 %  for a quadratic system.
 %
-%  v = solvePastEnergy(A,N,B,C,eta,d) 
+%  v = approxPastEnergy(A,N,B,C,eta,d) 
 %
 %  Computes a degree d polynomial approximation to the past energy function 
 %
@@ -46,7 +46,7 @@ function [v] = solvePastEnergy(A,N,B,C,eta,d)
     %  and know (-A,B) is a controllable pair if (A,B) is.
     [V2] = icare(-A,B,eta*(C.'*C),R);
     if ( isempty(V2) )
-      warning('solvePastEnergy: icare couldn''t find stabilizing solution')
+      warning('approxPastEnergy: icare couldn''t find stabilizing solution')
     end
     
     if ( isempty(V2) )
@@ -55,8 +55,8 @@ function [v] = solvePastEnergy(A,N,B,C,eta,d)
     end
     
     if ( isempty(V2) )
-      warning('solvePastEnergy: icare couldn''t find stabilizing solution')
-      fprintf('solvePastEnergy: using the hamiltonian')
+      warning('approxPastEnergy: icare couldn''t find stabilizing solution')
+      fprintf('approxPastEnergy: using the hamiltonian')
       [~,V2,E] = hamiltonian(-A,B,eta*(C.'*C),R,true);
     end
      
@@ -170,6 +170,6 @@ function [v] = solvePastEnergy(A,N,B,C,eta,d)
   end
   
   if ( d>8 )
-    warning('solvePastEnergy: monomial terms higher than degree 8 not computed')
+    warning('approxPastEnergy: monomial terms higher than degree 8 not computed')
   end
 end
