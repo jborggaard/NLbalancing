@@ -1,6 +1,20 @@
-%function [] = Example2(plotBalancing)
+function [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
 %EXAMPLE2 Runs the second example from the paper
 %
+%   Usage:   [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
+%
+%   where
+%         degree          is the degree of energy function approximations
+%         plotEnergy      is a logical variable to determine if a plot is made.
+%
+%         plotBalancing   is a logical variable to determine if a plot is made.
+%         balancingDegree is a small integer setting the degree of approximation
+%                         in the balancing transformation. Must be < degree.
+%                         (used if plotBalancing = true)
+%
+%         v,w             are coefficients of the past and future energy
+%                         function approximations, respectively.
+%    
 %   Nonlinear Balanced Truncation Model Reduction for Large-Scale 
 %   Polynomial Systems, by Kramer, Borggaard, and Gugercin, arXiv.
 %
@@ -10,18 +24,20 @@
 %   Part of the NLbalancing repository.
 %%
 
-%  if (nargin<1)
-    plotBalancing = true;
+  if (nargin<1)
+    degree = 6;
+    plotEnergy = true;
+
+    plotBalancing = false;
     balancingDegree = 5;
-%  end
+  end
 
-  degree = 6;
 
-%  if ( plotBalancing )
-%    dataRange = 6;
-%  else
-    dataRange = 0.1;%.75;
-%  end
+  if ( plotBalancing )
+    dataRange = 6;
+  else
+    dataRange = 0.75;
+  end
   
   A = [-1 1;0 -1];
   N = [0 0 0 -1;0 0 0 0];
@@ -42,30 +58,31 @@
   end
 
   %  Plot the future energy function for this example
-  disp('Future energy function for example 2')    
+  %disp('Future energy function for example 2')    
 
-  nX = 101; nY = 101;
-  xPlot = linspace(-dataRange,dataRange,nX);
-  yPlot = xPlot;
-  eFuture = zeros(nX,nY);
-  [X,Y] = meshgrid(xPlot,yPlot);
-  for i=1:nX
-    for j=1:nY
-      x = [X(i,j);Y(i,j)];
-      WBar = vbar(futureEnergy,x);
-      eFuture(i,j) = x.'*WBar*x;
+  if (plotEnergy || plotBalancing)
+    nX = 101; nY = 101;
+    xPlot = linspace(-dataRange,dataRange,nX);
+    yPlot = xPlot;
+    eFuture = zeros(nX,nY);
+    [X,Y] = meshgrid(xPlot,yPlot);
+    for i=1:nX
+      for j=1:nY
+        x = [X(i,j);Y(i,j)];
+        WBar = vbar(futureEnergy,x);
+        eFuture(i,j) = x.'*WBar*x;
+      end
     end
+    figure(1)
+    contourf(X,Y,eFuture)
+    xlabel('$x_1$','interpreter','latex'); 
+    ylabel('$x_2$','interpreter','latex'); 
+    colorbar('FontSize',16)
+    ax = gca;
+    set(gca,'FontSize',20)
+    exportgraphics(ax,'FEF_p0_1.pdf','ContentType','vector');
+    title('Future Energy Function')
   end
-  figure(1)
-  contourf(X,Y,eFuture)
-  xlabel('$x_1$','interpreter','latex'); 
-  ylabel('$x_2$','interpreter','latex'); 
-  colorbar('FontSize',16)
-  ax = gca;
-  set(gca,'FontSize',20)
-  exportgraphics(ax,'FEF_p0_1.pdf','ContentType','vector');
-  title('Future Energy Function')
-
 
   [v] = approxPastEnergy(A,N,B,C,eta,degree);
   pastEnergy{degree} = [];
@@ -74,43 +91,45 @@
   end
     
   %  Plot the past energy function for this example
-  disp('Past energy function for example 2')    
+  %disp('Past energy function for example 2')    
 
-  nX = 101; nY = 101;
-  xPlot = linspace(-dataRange,dataRange,nX);
-  yPlot = xPlot;
-  ePast = zeros(nX,nY);
-  [X,Y] = meshgrid(xPlot,yPlot);
-
-
-  for i=1:nX
-    for j=1:nY
-      x = [X(i,j);Y(i,j)];
-      VBar = vbar(pastEnergy,x);
-      ePast(i,j) = x.'*VBar*x;
+  if (plotEnergy || plotBalancing)
+    nX = 101; nY = 101;
+    xPlot = linspace(-dataRange,dataRange,nX);
+    yPlot = xPlot;
+    ePast = zeros(nX,nY);
+    [X,Y] = meshgrid(xPlot,yPlot);
+  
+  
+    for i=1:nX
+      for j=1:nY
+        x = [X(i,j);Y(i,j)];
+        VBar = vbar(pastEnergy,x);
+        ePast(i,j) = x.'*VBar*x;
+      end
     end
+    figure(2)
+    contourf(X,Y,ePast)
+    xlabel('$x_1$','interpreter','latex'); 
+    ylabel('$x_2$','interpreter','latex');
+    colorbar('FontSize',16)
+    ax = gca;
+    set(gca,'FontSize',20)
+    exportgraphics(ax,'PEF_p0_1.pdf','ContentType','vector');
+    title('Past Energy Function')
   end
-  figure(2)
-  contourf(X,Y,ePast)
-  xlabel('$x_1$','interpreter','latex'); 
-  ylabel('$x_2$','interpreter','latex');
-  colorbar('FontSize',16)
-  ax = gca;
-  set(gca,'FontSize',20)
-  exportgraphics(ax,'PEF_p0_1.pdf','ContentType','vector');
-  title('Past Energy Function')
 
-  save('Ex2_RawData.mat','x','v','w')
+  save('Ex2_RawData.mat','v','w')
 
 
   if ( plotBalancing )
-    [~,T] = inputNormalTransformation(v,w,balancingDegree-1);
+    [sigma,T] = inputNormalTransformation(v,w,balancingDegree);
     nPts = 201;
-    s = linspace(-0.15,0.15,nPts);
+    s = linspace(-2,2,nPts);
     lin = T{1}(:,1)*s;
     
     coord = lin;
-    for k=2:balancingDegree-1
+    for k=2:balancingDegree
       coord = coord + T{k}(:,1)*s.^k;
     end
     
@@ -142,6 +161,6 @@
     plot(lin(1,idxLin),lin(2,idxLin),'w+')
     plot(coord(1,idxCoord),coord(2,idxCoord),'r+')
   end
-%end
+end
 
 

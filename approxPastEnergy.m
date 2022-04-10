@@ -6,7 +6,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
 %
 %  Computes a degree d polynomial approximation to the past energy function 
 %
-%          E^-(x) = v{2}*kron(x,x) + ... + v{d}*kron(.. x)
+%          E^-(x) = 1/2 ( v{2}*kron(x,x) + ... + v{d}*kron(.. x) )
 %
 %  for the polynomial system
 %
@@ -18,7 +18,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
 %
 %    A'*V2 + V2*A + V2*B*B'*V2 - eta*C'*C = 0.
 %
-%  Note that v{2} = vec(V2) = V2(:).  Details are in Section 3.2 of the paper.
+%  Note that v{2} = vec(V2) = V2(:).  Details are in Section 3.3 of the paper.
 %
 %  Author: Jeff Borggaard, Virginia Tech
 %

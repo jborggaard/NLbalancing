@@ -4,7 +4,8 @@ Software that uses polynomials to approximately solve the nonlinear (NL) balanci
 - *Balanced Truncation Model Reduction for Large-Scale Polynomial Systems*
 
 by Boris Kramer, Jeff Borggaard, and Serkan Gugercin.  The Kronecker product
-solvers are based on those in the QQR software described in
+solvers are based on those in the KroneckerTools repository and also used for
+the QQR software described in
 
 - *Approximating Polynomial-Quadratic Regulator Problems, Arxiv*
 
@@ -13,8 +14,10 @@ by Jeff Borggaard and Lizette Zietsman (full references included below).
 ## Installation Notes
 Clone this repository: 
 ```
+  git clone https://www.github.com/jborggaard/KroneckerTools.git
   git clone https://www.github.com/jborggaard/NLbalancing.git
 ```
+then modify the path in **setKroneckerToolsPath.m**
 
 The installation can be tested in Matlab (we used R2020b) by typing
 ```
@@ -28,17 +31,29 @@ The details of some of our functions and test examples are provided below.
 
 Let A be n-by-n, B be n-by-m, C be p-by-n, and N be n-by-n^2 , with [A,B] a controllable pair and [A,C] a detectable pair.  The parameter eta is used we can compute the coefficients of the solution to future and past energy functions in Matlab as
 ```
->>  [v] = solveFutureEnergy(A,N,B,C,eta,degree);
+>>  [w] = approxFutureEnergy(A,N,B,C,eta,degree);
 
 and
 
->>  [w] = solvePastEnergy(A,N,B,C,eta,degree);
+>>  [v] = approxPastEnergy(A,N,B,C,eta,degree);
 ```
 The variable _v_ is a cell array with _v{2}_ being n-by-n^2 , up to _v{degree+1}_ which is n-by-n^(degree+1) .  These are coefficients of the polynomial approximation to the value function.  From an initial _x0_, we can compute the approximation to the energy function as
 ```
 >>  E = v{2}*kron(x0,x0) + ... + v{degree+1}*kron(kron(... ,x0),x0);
 ```
-(to do: create an efficient function that evaluates E)
+or, using the utility function,
+```
+>>  E = kronPolyEval(v(1:degree),x0,degree);
+```
+
+For details on how to compute input-normal balancing with **inBalance**, type
+```
+>>  help inBalance
+```
+Examples of input-normal balancing are found in the examples folder (Example1 and Example2).
+
+The **inBalance** function uses **inputNormalTransformation** and **approximateSinfularValueFunctions** and a
+tolerance to build a balanced reduced-order model.
 
 For details on how to run **HJBbalance**, type
 ```
@@ -53,9 +68,9 @@ and found in the examples directory
 
 
 ## Description of Files
-#### setKroneckerSumPath
+#### setKroneckerToolsPath
 
-Defines the path to the functions for working with Kronecker product expressions.
+Defines the path to the KroneckerTools directory containing functions for working with Kronecker product expressions.  KroneckerTools can be downloaded from github.com/jborggaard/KroneckerTools
 
 #### CT2Kron and Kron2CT
 
@@ -83,14 +98,25 @@ Efficiently computes the product of a special Kronecker sum matrix (aka an N-Way
 
 Approximates the future and past energy functions for a one-dimensional model problem motivated by the literature.  This appears as example 1 in Kramer, Borggaard, and Gugercin.
 
+### Example02.m
 
+Approximates the future and past energy functions, then computes an approximation to the (input-normal) balancing transformation and computes a reduced model.  The example is based on a two-dimensional problem found in Kawano and Scherpen, IEEE Transactions on Automatic Control, 2016 (we ignore their bilinear term in this example).
+
+
+## Algorithms from Kramer, Borggaard, and Gugercin
+
+### Algorithm 1 is implemented in _approxFutureEnergy.m_ and _approxPastEnergy.m_
+
+### Algorithm 2 is implemented in _inputNormalTransformation.m_
+
+### Algorithm 3 is implemented in _approximateSingularValueFunctions.m_
 
 ### References
 ```
   @misc{kramer2021balancedtruncation,
     title={Balanced Truncation Model Reduction for Large-Scale Polynomial Systems},
     author={Boris Kramer, Jeff Borggaard, and Serkan Gugercin},
-    year={2021},
+    year={2022},
     eprint={pending},
     archivePrefix={arXiv},
     primaryClass={math.OC}

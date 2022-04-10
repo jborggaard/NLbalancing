@@ -6,7 +6,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
 %
 %  Computes a degree d polynomial approximation to the future energy function 
 %
-%          E^+(x) = w{2}'*kron(x,x) + ... + w{d}'*kron(.. x)
+%          E^+(x) = 1/2 ( w{2}'*kron(x,x) + ... + w{d}'*kron(.. x) )
 %
 %  for the polynomial system
 %
@@ -18,7 +18,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
 %
 %    A'*W2 + W2*A - eta*W2*B*B'*W2 + C'*C = 0.
 %
-%  Note that w2 = vec(W2).  Details are in Section 3.1 of the reference.
+%  Note that w2 = vec(W2).  Details are in Section 3.2 of the reference.
 %
 %  Author: Jeff Borggaard, Virginia Tech
 %
