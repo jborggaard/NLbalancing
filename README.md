@@ -1,9 +1,11 @@
 # NLbalancing
 Software that uses polynomials to approximately solve the nonlinear (NL) balancing problem for systems with quadratic nonlinearities.  The description of the NL balancing algorithms are provided in the papers
 
-- *Balanced Truncation Model Reduction for Large-Scale Polynomial Systems*
+- *Nonlinear Balanced Truncation: Part 1-computing energy functions*
 
-by Boris Kramer, Jeff Borggaard, and Serkan Gugercin.  The Kronecker product
+- *Nonlinear Balanced Truncation: Part 2-nonlinear manifold model reduction*
+
+by Boris Kramer, Serkan Gugercin, and Jeff Borggaard.  The Kronecker product
 solvers are based on those in the KroneckerTools repository and also used for
 the QQR software described in
 
@@ -52,7 +54,7 @@ For details on how to compute input-normal balancing with **inBalance**, type
 ```
 Examples of input-normal balancing are found in the examples folder (Example1 and Example2).
 
-The **inBalance** function uses **inputNormalTransformation** and **approximateSinfularValueFunctions** and a
+The **inBalance** function uses **inputNormalTransformation** and **approximateSingularValueFunctions** and a
 tolerance to build a balanced reduced-order model.
 
 For details on how to run **HJBbalance**, type
@@ -113,8 +115,8 @@ Approximates the future and past energy functions, then computes an approximatio
 
 ### References
 ```
-  @misc{kramer2021balancedtruncation,
-    title={Balanced Truncation Model Reduction for Large-Scale Polynomial Systems},
+  @misc{kramer2022balancedtruncation1,
+    title={Nonlinear Balanced Truncation: Part 1-computing energy functions},
     author={Boris Kramer, Jeff Borggaard, and Serkan Gugercin},
     year={2022},
     eprint={pending},
@@ -124,12 +126,23 @@ Approximates the future and past energy functions, then computes an approximatio
 ```
 
 ```
-  @misc{borggaard2019quadraticquadratic,
+  @misc{kramer2022balancedtruncation2,
+    title={Nonlinear Balanced Truncation: Part 2-nonlinear manifold model reduction},
+    author={Boris Kramer, Jeff Borggaard, and Serkan Gugercin},
+    year={2022},
+    eprint={pending},
+    archivePrefix={arXiv},
+    primaryClass={math.OC}
+  }
+```
+
+```
+  @inproceedings{borggaard2019quadraticquadratic,
     title={The Quadratic-Quadratic Regulator Problem: 
      Approximating feedback controls for quadratic-in-state nonlinear systems},
     author={Jeff Borggaard and Lizette Zietsman}, 
-    note={to appear in the Proceedings of the 2020 American Conference on Control},
-    year={2019},
+    booktitle={Proceedings of the 2020 American Conference on Control},
+    year={2020},
     eprint={1910.03396},
     archivePrefix={arXiv},
     primaryClass={math.OC}
@@ -137,11 +150,14 @@ Approximates the future and past energy functions, then computes an approximatio
 ```
 
 ```
-  @misc{borggaard2020polynomialquadratic,
+  @article{borggaard2021polynomialquadratic,
     title={On Approximating Polynomial-Quadratic Regulator Problems},
     author={Jeff Borggaard and Lizette Zietsman},
-    year={2020},
-    note={submitted}
+    journal={IFAC-PaersOnLine},
+    volume=54,
+    number=9,
+    pages={329--334},
+    year={2021}
   }
 ```
 

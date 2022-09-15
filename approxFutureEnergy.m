@@ -1,4 +1,4 @@
-function [w] = approxFutureEnergy(A,N,B,C,eta,d)
+function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
 %  Calculates a polynomial approximation to the future energy function
 %  for a quadratic system.
 %
@@ -18,19 +18,24 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
 %
 %    A'*W2 + W2*A - eta*W2*B*B'*W2 + C'*C = 0.
 %
-%  Note that w2 = vec(W2).  Details are in Section 3.2 of the reference.
+%  Note that w2 = vec(W2).  Details are in Section III.B of the reference.
 %
 %  Author: Jeff Borggaard, Virginia Tech
 %
 %  Licence: MIT
 %
-%  Reference:  Nonlinear balanced truncation model reduction for large-scale
-%              polynomial systems, arXiv
+%  Reference: Nonlinear balanced truncation: Part 1--Computing energy functions,
+%             Kramer, Gugercin, and Borggaard, arXiv.
 %
-%              See Algorithm 1.
+%             See Algorithm 1.
 %
 %  Part of the NLbalancing repository.
 %%
+
+  if (nargin<7)
+    verbose = false;
+  end
+
   n = size(A,1);
   m = size(B,2);
 
@@ -43,14 +48,14 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
 
   if ( eta>0 )
     [W2] = icare(A,B,(C.'*C),R);
-    if ( isempty(W2) )
+    if ( isempty(W2) && verbose )
       warning('approxFutureEnergy: icare couldn''t find stabilizing solution')
     end
     
   elseif ( eta<0 )
     [W2] = icare(A,B,(C.'*C),R,'anti');
     
-    if ( isempty(W2) )
+    if ( isempty(W2) && verbose )
       warning('approxFutureEnergy: icare couldn''t find stabilizing solution')
       warning('approxFutureEnergy: using the hamiltonian')
       [~,W2,~] = hamiltonian(A,B,C.'*C,R,true);
@@ -58,9 +63,14 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
     
   else % eta==0
     [W2] = lyap(A.',(C.'*C));
+    
   end
 
-  %  Reshape the resulting second-order term 
+  if (isempty(W2))
+    error('approxFutureEnergy: Can''t find a stabilizing solution')
+  end
+  
+  %  Reshape the resulting quadratic coefficients
   w2 = W2(:);
   w{2} = w2;
 
@@ -68,9 +78,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
     b = -LyapProduct(N.',w2,2);
     [w3] = KroneckerSumSolver(Acell(1:3),b,2,-3*eta*W2*(B*B.'));
     
-    S  = Kron2CT(n,3);
-    C  = CT2Kron(n,3);
-    w3 = C*S*w3;
+    [w3] = kronPolySymmetrize(w3,n,3);
 
     w{3} = w3;
   end
@@ -81,9 +89,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
     b = -LyapProduct(N.',w3,3) + 9*eta*W3BBW3(:)/4;
     [w4] = KroneckerSumSolver(Acell(1:4),b,3,-4*eta*W2*(B*B.'));
 
-    S  = Kron2CT(n,4);
-    C  = CT2Kron(n,4);
-    w4 = C*S*w4;
+    [w4] = kronPolySymmetrize(w4,n,4);
     
     w{4} = w4;
   end
@@ -96,9 +102,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
                                  12*eta*W4BBW3(:)/4;
     [w5] = KroneckerSumSolver(Acell(1:5),b,4,-5*eta*W2*(B*B.'));
 
-    S  = Kron2CT(n,5);
-    C  = CT2Kron(n,5);
-    w5 = C*S*w5;
+    [w5] = kronPolySymmetrize(w5,n,5);
     
     w{5} = w5;
   end
@@ -113,9 +117,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
                                  15*eta*W5BBW3(:)/4;
     [w6] = KroneckerSumSolver(Acell(1:6),b,5,-6*eta*W2*(B*B.'));
 
-    S  = Kron2CT(n,6);
-    C  = CT2Kron(n,6);
-    w6 = C*S*w6;
+    [w6] = kronPolySymmetrize(w6,n,6);
     
     w{6} = w6;
   end
@@ -132,9 +134,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
                                  18*eta*W6BBW3(:)/4;
     [w7] = KroneckerSumSolver(Acell(1:7),b,6,-7*eta*W2*(B*B.'));
 
-    S  = Kron2CT(n,7);
-    C  = CT2Kron(n,7);
-    w7 = C*S*w7;
+    [w7] = kronPolySymmetrize(w7,n,7);
     
     w{7} = w7;
   end
@@ -152,6 +152,10 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d)
                                  24*eta*W6BBW4(:)/4 + ...
                                  21*eta*W7BBW3(:)/4;
     [w8] = KroneckerSumSolver(Acell(1:8),b,7,-8*eta*W2*(B*B.'));
+
+    % KronPolySymmetrize does not currently handle 8th degree coefficients
+    % so we simply return the unsymmetrized coefficients.
+
     w{8} = w8;
   end
   

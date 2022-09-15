@@ -1,4 +1,4 @@
-function [v] = approxPastEnergy(A,N,B,C,eta,d)
+function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
 %  Calculates a polynomial approximation to the past energy function
 %  for a quadratic system.
 %
@@ -6,7 +6,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
 %
 %  Computes a degree d polynomial approximation to the past energy function 
 %
-%          E^-(x) = 1/2 ( v{2}*kron(x,x) + ... + v{d}*kron(.. x) )
+%          E^-(x) = 1/2 ( v{2}'*kron(x,x) + ... + v{d}'*kron(.. x) )
 %
 %  for the polynomial system
 %
@@ -18,21 +18,27 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
 %
 %    A'*V2 + V2*A + V2*B*B'*V2 - eta*C'*C = 0.
 %
-%  Note that v{2} = vec(V2) = V2(:).  Details are in Section 3.3 of the paper.
+%  Note that v{2} = vec(V2) = V2(:).  Details are in Section III.C of the paper.
 %
 %  Author: Jeff Borggaard, Virginia Tech
 %
 %  Licence: MIT
 %
-%  Reference:  Nonlinear balanced truncation model reduction for large-scale
-%              polynomial systems, arXiv
+%  Reference: Nonlinear balanced truncation: Part 1--Computing energy functions,
+%             Kramer, Gugercin, and Borggaard, arXiv.
 %
-%              See Algorithm 1.
+%             See Algorithm 1.
 %
 %  Part of the NLbalancing repository.
 %%
+
+  if (nargin<7)
+    verbose = false;
+  end
+
   n = size(A,1);
   m = size(B,2);
+  p = size(C,1);
 
   R = eye(m);
   
@@ -43,21 +49,36 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
 
   if ( eta~=0 )
     %  We multiply the ARE by -1 to put it into the standard form,
-    %  and know (-A,B) is a controllable pair if (A,B) is.
-    [V2] = icare(-A,B,eta*(C.'*C),R);
-    if ( isempty(V2) )
+    %  and know (-A,-B) is a controllable pair if (A,B) is.
+    [V2] = icare(-A,-B,eta*(C.'*C),R);
+
+    if ( isempty(V2) && verbose )
       warning('approxPastEnergy: icare couldn''t find stabilizing solution')
     end
     
     if ( isempty(V2) )
-      fprintf("trying the anti-solution")
+      if (verbose) 
+        warning('approxPastEnergy: using matrix inverse')
+      end
+      [Yinf] = icare(A.',C.',B*B.',eye(p)/eta);
+      if ( isempty(Yinf) )
+        V2 = [];
+      else
+        V2 = inv(Yinf);  % yikes!!!
+      end
+    end
+
+    if ( isempty(V2) )
+      if (verbose), fprintf("trying the anti-solution\n"), end
       [V2] = icare(-A,B,eta*(C.'*C),R,'anti');
     end
     
     if ( isempty(V2) )
-      warning('approxPastEnergy: icare couldn''t find stabilizing solution')
-      fprintf('approxPastEnergy: using the hamiltonian')
-      [~,V2,E] = hamiltonian(-A,B,eta*(C.'*C),R,true);
+      if (verbose)
+        warning('approxPastEnergy: icare couldn''t find stabilizing solution')
+        fprintf('approxPastEnergy: using the hamiltonian\n')
+      end
+      [~,V2,~] = hamiltonian(-A,B,eta*(C.'*C),R,true);
     end
      
     if ( isempty(V2) )
@@ -67,7 +88,8 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
     %V2 = real(V2);
   
   else % eta==0
-    warning('read the paper')
+    %  This case is described in Section II.B of the paper and requires a
+    %  matrix inverse to calculate E_c.
     [V2] = lyap(A,(B*B.'));
     V2 = inv(V2); % yikes!!!!!!!!
     
@@ -82,22 +104,18 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
     b = -LyapProduct(N.',v2,2);
     [v3] = KroneckerSumSolver(Acell(1:3),b,2,3*V2BB);
 
-    S  = Kron2CT(n,3);
-    C  = CT2Kron(n,3);
-    v3 = C*S*v3;
+    [v3] = kronPolySymmetrize(v3,n,3);
     
     v{3} = v3;
   end
   
   if ( d>3 )
     V3 = reshape(v3,n,n^2);
-    V3BBV3 = (V3.'*B)*(B.'*V3);  % just for now...
+    V3BBV3 = (V3.'*B)*(B.'*V3);  % just for now... eventually store Vk.'*B
     b = -LyapProduct(N.',v3,3) - 9*V3BBV3(:)/4;
     [v4] = KroneckerSumSolver(Acell(1:4),b,3,4*V2BB);
 
-    S  = Kron2CT(n,4);
-    C  = CT2Kron(n,4);
-    v4 = C*S*v4;
+    [v4] = kronPolySymmetrize(v4,n,4);
     
     v{4} = v4;
   end
@@ -110,9 +128,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
                                  12*V4BBV3(:)/4;
     [v5] = KroneckerSumSolver(Acell(1:5),b,4,5*V2BB);
 
-    S  = Kron2CT(n,5);
-    C  = CT2Kron(n,5);
-    v5 = C*S*v5;
+    [v5] = kronPolySymmetrize(v5,n,5);
     
     v{5} = v5;
   end
@@ -127,9 +143,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
                                  15*V5BBV3(:)/4;
     [v6] = KroneckerSumSolver(Acell(1:6),b,5,6*V2BB);
 
-    S  = Kron2CT(n,6);
-    C  = CT2Kron(n,6);
-    v6 = C*S*v6;
+    [v6] = kronPolySymmetrize(v6,n,6);
     
     v{6} = v6;
   end
@@ -146,9 +160,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
                                  18*V6BBV3(:)/4;
     [v7] = KroneckerSumSolver(Acell(1:7),b,6,7*V2BB);
 
-    S  = Kron2CT(n,7);
-    C  = CT2Kron(n,7);
-    v7 = C*S*v7;
+    [v7] = kronPolySymmetrize(v7,n,7);
     
     v{7} = v7;
   end
@@ -166,6 +178,10 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d)
                                  24*V6BBV4(:)/4 - ...
                                  21*V7BBV3(:)/4;
     [v8] = KroneckerSumSolver(Acell(1:8),b,7,8*V2BB);
+
+    % KronPolySymmetrize does not currently handle 8th degree coefficients
+    % so we simply return the unsymmetrized coefficients.
+
     v{8} = v8;
   end
   

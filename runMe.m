@@ -1,9 +1,12 @@
+setKroneckerToolsPath
 addpath('development')
 addpath('examples')
-addpath('kronecker')
 addpath('utils')
 
-%Example1
+runExample1
 
-Example2(6,false,5);
+%[v,w] = runExample2(6,true,true,5);
 
+%runExample3
+
+%runExample4

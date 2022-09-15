@@ -1,7 +1,7 @@
-function [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
+function [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree)
 %EXAMPLE2 Runs the second example from the paper
 %
-%   Usage:   [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
+%   Usage:  [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree)
 %
 %   where
 %         degree          is the degree of energy function approximations
@@ -14,9 +14,12 @@ function [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
 %
 %         v,w             are coefficients of the past and future energy
 %                         function approximations, respectively.
-%    
-%   Nonlinear Balanced Truncation Model Reduction for Large-Scale 
-%   Polynomial Systems, by Kramer, Borggaard, and Gugercin, arXiv.
+%
+%   The value of eta is set below.
+%
+%   Reference: Nonlinear Balanced Truncation Model Reduction: 
+%        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
+%        arXiv.
 %
 %   This example is motivated by Kawano and Scherpen, IEEE Transactions
 %   on Automatic Control, 2016.  Here we ignore the bilinear term 2*x_2*u.
@@ -24,37 +27,37 @@ function [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
 %   Part of the NLbalancing repository.
 %%
 
-  if (nargin<1)
-    degree = 6;
-    plotEnergy = true;
-
-    plotBalancing = false;
-    balancingDegree = 5;
-  end
-
-
-  if ( plotBalancing )
-    dataRange = 6;
-  else
-    dataRange = 0.75;
-  end
+  fprintf('Running Example2\n')
   
-  A = [-1 1;0 -1];
-  N = [0 0 0 -1;0 0 0 0];
-  B = [1;1];
-  C = [1 1];
- 
   eta = 0.1;    % values should be between -\infty and 1.
                 % eta=0.1 corresponds to gamma= 1.0541...
                 % since eta = 1 - 1/gamma^2;
 
   fprintf('Simulating for eta=%g (gamma=%g)\n',eta,1/sqrt(1-eta))
 
+
+  if (nargin<1)
+    degree = 4;
+    plotEnergy = true;
+
+    plotBalancing = false;
+    balancingDegree = 3;
+  end
+
+
+  if ( plotBalancing )
+    dataRange = 0.35; %6.0
+  else
+    dataRange = 0.35; %0.75;
+  end
+  
+  [A,B,C,N] = getSystem2();
+ 
   %  Compute the polynomial approximations to the future energy function
   [w] = approxFutureEnergy(A,N,B,C,eta,degree);
   futureEnergy{degree} = [];
   for k=2:degree
-    futureEnergy{k} = w{k}/2;
+    futureEnergy{k} = w{k}.'/2;
   end
 
   %  Plot the future energy function for this example
@@ -69,8 +72,9 @@ function [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
     for i=1:nX
       for j=1:nY
         x = [X(i,j);Y(i,j)];
-        WBar = vbar(futureEnergy,x);
-        eFuture(i,j) = x.'*WBar*x;
+%         WBar = vbar(futureEnergy,x);
+%         eFuture(i,j) = x.'*WBar*x;
+        eFuture(i,j) = kronPolyEval(futureEnergy,x,degree);
       end
     end
     figure(1)
@@ -84,10 +88,10 @@ function [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
     title('Future Energy Function')
   end
 
-  [v] = approxPastEnergy(A,N,B,C,eta,degree);
+  [v] = approxPastEnergy(A,N,B,C,eta,degree,true);
   pastEnergy{degree} = [];
   for k=2:degree
-    pastEnergy{k} = v{k}/2;
+    pastEnergy{k} = v{k}.'/2;
   end
     
   %  Plot the past energy function for this example
@@ -104,12 +108,13 @@ function [v,w] = Example2(degree,plotEnergy,plotBalancing,balancingDegree)
     for i=1:nX
       for j=1:nY
         x = [X(i,j);Y(i,j)];
-        VBar = vbar(pastEnergy,x);
-        ePast(i,j) = x.'*VBar*x;
+%         VBar = vbar(pastEnergy,x);
+%         ePast(i,j) = x.'*VBar*x;
+        ePast(i,j) = kronPolyEval(pastEnergy,x,degree);
       end
     end
     figure(2)
-    contourf(X,Y,ePast)
+    mesh(X,Y,ePast)
     xlabel('$x_1$','interpreter','latex'); 
     ylabel('$x_2$','interpreter','latex');
     colorbar('FontSize',16)
