@@ -1,5 +1,4 @@
 setKroneckerToolsPath
-addpath('development')
 addpath('examples')
 addpath('utils')
 

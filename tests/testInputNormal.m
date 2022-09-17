@@ -8,9 +8,8 @@
 
 setKroneckerToolsPath
 
-addpath('development')
-addpath('examples')
-addpath('utils')
+addpath('../examples')
+addpath('../utils')
 
 testcase=2;
 switch testcase
@@ -29,7 +28,7 @@ switch testcase
     [v] = approxPastEnergy(A,N,B,C,eta,degree);
 
   case 2
-    [v,w] = Example2(6,false,false,5);
+    [v,w] = runExample2(6,false,false,5);
 
   otherwise
     error('unknown testcase\n')
@@ -63,3 +62,5 @@ end
 fprintf('The maximum error is %g\n',maxErr);
 % figure(3)
 % surf(Eplot)
+
+
