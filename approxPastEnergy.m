@@ -10,7 +10,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
 %
 %  for the polynomial system
 %
-%    \dot{x} = Ax + Bu + N*kron(x,x)
+%    \dot{x} = Ax + N*kron(x,x) + Bu
 %          y = Cx
 %
 %  where eta = 1-gamma^(-2), gamma is the parameter in the algebraic Riccati
@@ -20,12 +20,17 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
 %
 %  Note that v{2} = vec(V2) = V2(:).  Details are in Section III.C of the paper.
 %
+%  Requires functions from the KroneckerTools repository
+%      KroneckerSumSolver
+%      kronPolySymmetrize
+%      LyapProduct
+%
 %  Author: Jeff Borggaard, Virginia Tech
 %
-%  Licence: MIT
+%  License: MIT
 %
 %  Reference: Nonlinear balanced truncation: Part 1--Computing energy functions,
-%             Kramer, Gugercin, and Borggaard, arXiv.
+%             by Kramer, Gugercin, and Borggaard, arXiv:2209.07645.
 %
 %             See Algorithm 1.
 %
@@ -36,9 +41,9 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
     verbose = false;
   end
 
-  n = size(A,1);
-  m = size(B,2);
-  p = size(C,1);
+  n = size(A,1);   % A should be n-by-n
+  m = size(B,2);   % B should be n-by-m
+  p = size(C,1);   % C should be p-by-n
 
   R = eye(m);
   
@@ -48,7 +53,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
   end
 
   if ( eta~=0 )
-    %  We multiply the ARE by -1 to put it into the standard form,
+    %  We multiply the ARE by -1 to put it into the standard form in icare,
     %  and know (-A,-B) is a controllable pair if (A,B) is.
     [V2] = icare(-A,-B,eta*(C.'*C),R);
 
@@ -79,19 +84,21 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
         fprintf('approxPastEnergy: using the hamiltonian\n')
       end
       [~,V2,~] = hamiltonian(-A,B,eta*(C.'*C),R,true);
+      V2 = real(V2);
     end
      
     if ( isempty(V2) )
       error('Could not find a solution to the ARE, adjust the eta parameter')
     end
-    %[~,V2,~] = hamiltonian(-A,B,eta*(C.'*C),R);
-    %V2 = real(V2);
   
   else % eta==0
     %  This case is described in Section II.B of the paper and requires a
     %  matrix inverse to calculate E_c.
     [V2] = lyap(A,(B*B.'));
     V2 = inv(V2); % yikes!!!!!!!!
+
+    %  To do: look at approximating this by [V2] = icare(-A,-B,eta*(C.'*C),R)
+    %  with a small value of eta (and perhaps other choices for C.'*C)
     
   end
   
@@ -166,7 +173,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
   end
   
   if ( d>7 )
-    V7 = reshape(v7,n,n^5);
+    V7 = reshape(v7,n,n^6);
     V3BBV7 = (V3.'*B)*(B.'*V7);
     V4BBV6 = (V4.'*B)*(B.'*V6);
     V5BBV5 = (V5.'*B)*(B.'*V5);

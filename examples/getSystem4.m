@@ -350,11 +350,14 @@ end
 function [z0,z0p] = zZero(x,L)
 %  Sets the initial function (FEM coefs are determined by projection)
   
+%   z0  = sin(2*pi*x)*L;
+%   z0p = 2*cos(2*pi*x)*L;
+  
+  %  The following function is for the heteroclinic cycle used in Dankowicz
+  %  et al., 1996
   z0  = sin(4*pi*x)*L;
   z0p = 4*pi*cos(4*pi*x)*L;
-  z0  = sin(pi*x)*L;
-  z0p = pi*cos(pi*x)*L;
-  
+
 end
 
 function M = oned_bilinear( kernel, phi, test, w_g )

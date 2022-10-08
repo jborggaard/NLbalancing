@@ -19,7 +19,7 @@ function [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree)
 %
 %   Reference: Nonlinear Balanced Truncation Model Reduction: 
 %        Part 1-Computing Energy Functions, by Kramer, Gugercin, and Borggaard.
-%        arXiv.
+%        arXiv:2209.07645.
 %
 %   This example is motivated by Kawano and Scherpen, IEEE Transactions
 %   on Automatic Control, 2016.  Here we ignore the bilinear term 2*x_2*u.
@@ -54,7 +54,7 @@ function [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree)
   [A,B,C,N] = getSystem2();
  
   %  Compute the polynomial approximations to the future energy function
-  [w] = approxFutureEnergy(A,N,B,C,eta,degree);
+  [w] = approxFutureEnergy(A,N,B,C,eta,degree,true);
   futureEnergy{degree} = [];
   for k=2:degree
     futureEnergy{k} = w{k}.'/2;
@@ -114,7 +114,8 @@ function [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree)
       end
     end
     figure(2)
-    mesh(X,Y,ePast)
+    contourf(X,Y,ePast)
+%    mesh(X,Y,ePast)
     xlabel('$x_1$','interpreter','latex'); 
     ylabel('$x_2$','interpreter','latex');
     colorbar('FontSize',16)

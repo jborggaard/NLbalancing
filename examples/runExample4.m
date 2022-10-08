@@ -31,7 +31,7 @@ for n=[8,16,32]   % number of elements, the actual number of states is 2*n
   fprintf('%8.2e & ',tt)
 
   for d=2:degree, w{d} = w{d}.'; end
-  wzInit = kronPolyEval(w,zInit,degree);
+  wzInit = 0.5*kronPolyEval(w,zInit,degree);
   fprintf('%12.6e \\\\ \n',wzInit)
 end
 
@@ -49,7 +49,7 @@ for n=[64,128,256,512]
   fprintf('%8.2e & ',tt)
   
   for d=2:degree, w{d} = w{d}.'; end
-  wzInit = kronPolyEval(w,zInit,degree);
+  wzInit = 0.5*kronPolyEval(w,zInit,degree);
   fprintf('%12.6e \\\\ \n',wzInit)
 end
  
@@ -64,16 +64,20 @@ zInit = z_factor*zInit;
 for degree=[2,3,4,5,6]  % only the last one is needed, but use this for timing
   fprintf('%d & ',degree)
 
-  tic; [v] = approxPastEnergy(full(A),N,B,C,eta,degree,true); tt=toc;
+  tic; 
+  for kount=1:2^(8-degree), 
+    [v] = approxPastEnergy(full(A),N,B,C,eta,degree,false); 
+  end
+  tt=toc/2^(8-degree);
   for d=2:degree, v{d} = v{d}.'; end
-  vzInit = kronPolyEval(v,zInit,degree);
-  fprintf('%12.6e & ',vzInit)
-  fprintf('%8.2e & ',tt)
+  vzInit = 0.5*kronPolyEval(v,zInit,degree);
+  fprintf('%12.6e ',vzInit)
+  fprintf('(%8.2e) & ',tt)
 
-  tic; [w] = approxFutureEnergy(full(A),N,B,C,eta,degree,true); tt=toc;
+  tic; [w] = approxFutureEnergy(full(A),N,B,C,eta,degree,false); tt=toc;
   for d=2:degree, w{d} = w{d}.'; end
-  wzInit = kronPolyEval(w,zInit,degree);
-  fprintf('%12.6e & ' ,wzInit)
-  fprintf('%8.2e \\\\ \n',tt)
+  wzInit = 0.5*kronPolyEval(w,zInit,degree);
+  fprintf('%12.6e ' ,wzInit)
+  fprintf('(%8.2e) \\\\ \n',tt)
 end
 save('KSenergyFcns.mat')

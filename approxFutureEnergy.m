@@ -20,12 +20,17 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
 %
 %  Note that w2 = vec(W2).  Details are in Section III.B of the reference.
 %
+%  Requires the following functions from the KroneckerTools repository:
+%      KroneckerSumSolver
+%      kronPolySymmetrize
+%      LyapProduct
+%
 %  Author: Jeff Borggaard, Virginia Tech
 %
-%  Licence: MIT
+%  License: MIT
 %
 %  Reference: Nonlinear balanced truncation: Part 1--Computing energy functions,
-%             Kramer, Gugercin, and Borggaard, arXiv.
+%             by Kramer, Gugercin, and Borggaard, arXiv:2209.07645.
 %
 %             See Algorithm 1.
 %
@@ -70,6 +75,12 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
     error('approxFutureEnergy: Can''t find a stabilizing solution')
   end
   
+  %  Check the residual of the Riccati/Lyapunov equation
+  if (verbose)
+    RES = A'*W2 + W2*A - eta*(W2*B)*(B'*W2) + C'*C ;
+    fprintf('The residual of the Riccati equation is %g\n',norm(RES,'inf'));
+  end
+
   %  Reshape the resulting quadratic coefficients
   w2 = W2(:);
   w{2} = w2;

@@ -119,7 +119,7 @@ Approximates the future and past energy functions, then computes an approximatio
     title={Nonlinear Balanced Truncation: Part 1-computing energy functions},
     author={Boris Kramer, Jeff Borggaard, and Serkan Gugercin},
     year={2022},
-    eprint={pending},
+    eprint={2209.07645},
     archivePrefix={arXiv},
     primaryClass={math.OC}
   }

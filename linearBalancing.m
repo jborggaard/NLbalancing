@@ -1,6 +1,13 @@
 function [T1,Sigma] = linearBalancing(A,B,C)
-%linearBalancing solves the linear balancing problem.
+%linearBalancing solves the linear balancing problem for comparison.
 %
+%  Author: Jeff Borggaard, Virginia Tech
+%
+%  License: MIT
+%
+%  Reference:  Nonlinear balanced truncation: Part 2--Model reduction on
+%              manifolds, by Kramer, Gugercin, and Borggaard, arXiv.
+%            
 %  Part of the NLbalancing library.
 
   %  Compute the infinite reachability Gramian.  This can be

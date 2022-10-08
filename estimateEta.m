@@ -18,7 +18,7 @@ function [etaMin,etaMax] = estimateEta(A,B,C)
 %  Licence: MIT
 %
 %  Reference: Nonlinear balanced truncation: Part 1--Computing energy functions,
-%             Kramer, Gugercin, and Borggaard, arXiv.
+%             Kramer, Gugercin, and Borggaard, arXiv:2209.07645.
 %
 %             See Remark 1.
 %
