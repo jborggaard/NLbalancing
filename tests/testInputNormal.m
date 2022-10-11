@@ -7,11 +7,11 @@
 %%
 
 setKroneckerToolsPath
-
+addpath('..')
 addpath('../examples')
 addpath('../utils')
 
-testcase=2;
+testcase=1;
 switch testcase
   case 1    % a random quadratic system
     n = 2;
@@ -31,14 +31,14 @@ switch testcase
     [v,w] = runExample2(6,false,false,5);
 
   otherwise
-    error('unknown testcase\n')
+    error('testInputNormal: unknown testcase\n')
 end
 
 [sigma,T] = inputNormalTransformation(v,w,5);
 
-%  Testing that Eminus(T{1}*z+T{2}*kron(z,z)+...) = 0.5 z.'*z
+%  Testing that 0.5*Eminus(T{1}*z+T{2}*kron(z,z)+...) = 0.5*z.'*z
 N = 101;
-zmin=-.5; zmax=.5; dz=(zmax-zmin)/N;
+zmin=-.2; zmax=.2; dz=(zmax-zmin)/N;
 maxErr = 0;
 degree = 1;
 vT = cell(size(v));
@@ -53,14 +53,12 @@ for i=1:N
     x = kronPolyEval(T,z,degree);
     LHS = kronPolyEval(vT,x,degree+1);
     RHS = z.'*z;
-    error = abs(LHS-RHS);%/(abs(RHS)+1e-8);
+    error = abs(LHS-RHS);
     Eplot(i,j) = error;
     maxErr = max(maxErr,error);
   end
 end
 
-fprintf('The maximum error is %g\n',maxErr);
+fprintf('testInputNormal: The maximum error is %g\n',maxErr);
 % figure(3)
 % surf(Eplot)
-
-

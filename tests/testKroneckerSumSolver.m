@@ -1,5 +1,6 @@
 %%  Testing solution to (52)  (V3 equation)
-%  addpath('../kronecker')
+
+  addpath('..')
   setKroneckerToolsPath
   
   A = rand(2,2);
@@ -38,4 +39,5 @@
       
   end
   
-  fprintf('The error between the kronecker sum solver and a direct solver is %g\n',norm(V3_1-V3,'inf') )
+  fprintf('testKroneckerSumSolver: The error between the kronecker sum solver\n')
+  fprintf('and a direct solver is %g\n\n',norm(V3_1-V3,'inf') )
