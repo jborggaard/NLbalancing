@@ -23,8 +23,13 @@ then modify the path in **setKroneckerToolsPath.m**
 
 The installation can be tested in Matlab (we used R2020b) by typing
 ```
->> examplesForPaper
+>> examplesForPaper1
 ```
+and
+```
+>> examplesForPaper2
+```
+that provide the numerical results for our nonlinear balanced truncation papers.
 
 The details of some of our functions and test examples are provided below.  
 
@@ -41,21 +46,20 @@ and
 ```
 The variable _v_ is a cell array with _v{2}_ being n-by-n^2 , up to _v{degree+1}_ which is n-by-n^(degree+1) .  These are coefficients of the polynomial approximation to the value function.  From an initial _x0_, we can compute the approximation to the energy function as
 ```
->>  E = v{2}*kron(x0,x0) + ... + v{degree+1}*kron(kron(... ,x0),x0);
+>>  E = (1/2)*( v{2}*kron(x0,x0) + ... + v{degree+1}*kron(kron(... ,x0),x0) );
 ```
 or, using the utility function,
 ```
->>  E = kronPolyEval(v(1:degree),x0,degree);
+>>  E = (1/2)*kronPolyEval(v(1:degree),x0,degree);
 ```
 
 For details on how to compute input-normal balancing with **inBalance**, type
 ```
 >>  help inBalance
 ```
-Examples of input-normal balancing are found in the examples folder (Example1 and Example2).
+Examples of input-normal balancing are found in the examples folder (inExample1 and inExample2).
 
-The **inBalance** function uses **inputNormalTransformation** and **approximateSingularValueFunctions** and a
-tolerance to build a balanced reduced-order model.
+The **inBalance** function uses **inputNormalTransformation** and **approximateSingularValueFunctions** with a provided tolerance to build a balanced reduced-order model.
 
 For details on how to run **HJBbalance**, type
 ```
@@ -64,15 +68,15 @@ For details on how to run **HJBbalance**, type
 
 for examples how to run **HJBbalance** see those in
 ```
->> examplesForPaper
+>> examplesForPaper3
 ```
-and found in the examples directory
+and the files in the examples directory.
 
 
 ## Description of Files
 #### setKroneckerToolsPath
 
-Defines the path to the KroneckerTools directory containing functions for working with Kronecker product expressions.  KroneckerTools can be downloaded from github.com/jborggaard/KroneckerTools
+Defines the path to the KroneckerTools directory containing functions for working with Kronecker product expressions.  KroneckerTools can be downloaded from github.com/jborggaard/KroneckerTools  The default assumes that NLbalancing and KroneckerTools lie in the same directory and uses relative pathnames.  This should be changed if you use different locations.  (setKroneckerToolsPath also lies in the examples and tests directories, so should be changed there as well if you plan to run functions from those directories.
 
 #### CT2Kron and Kron2CT
 
@@ -88,7 +92,7 @@ p(x) = [c1 c2/2 c2/2 c3] * kron([x1;x2],[x1;x2]) written as
 
 p(x) = ( Kron2CT(n,degree) * [c1 c2/2 c2/2 c3].' ).' * [x1^2 x1x2 x2^2 ].'
 
-There mappings are used to balance coefficients of the feedback and value functions.  (e.g., in the Kronecker form, we seek the same coefficient for x1 x2 and x2 x1).
+There mappings are used to balance coefficients of the feedback and value functions.  (e.g., in the Kronecker form, we seek the same coefficient for x1 x2 and x2 x1).  This is done automatically using the provided function, kronPolySymmetrize.
 
 #### LyapProduct
 
@@ -105,15 +109,17 @@ Approximates the future and past energy functions for a one-dimensional model pr
 Approximates the future and past energy functions, then computes an approximation to the (input-normal) balancing transformation and computes a reduced model.  The example is based on a two-dimensional problem found in Kawano and Scherpen, IEEE Transactions on Automatic Control, 2016 (we ignore their bilinear term in this example).
 
 
-## Algorithms from Kramer, Borggaard, and Gugercin
+## Algorithms from Kramer, Gugercin, and Borggaard, Part 1:
 
 ### Algorithm 1 is implemented in _approxFutureEnergy.m_ and _approxPastEnergy.m_
 
-### Algorithm 2 is implemented in _inputNormalTransformation.m_
+## Algorithms from Kramer, Gugercin, and Borggaard, Part 2:
 
-### Algorithm 3 is implemented in _approximateSingularValueFunctions.m_
+### Algorithm 1 is implemented in _inputNormalTransformation.m_
 
-### References
+### Algorithm 2 is implemented in _approximateSingularValueFunctions.m_
+
+## References
 ```
   @misc{kramer2022balancedtruncation1,
     title={Nonlinear Balanced Truncation: Part 1-computing energy functions},

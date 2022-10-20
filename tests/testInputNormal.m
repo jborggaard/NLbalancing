@@ -62,3 +62,27 @@ end
 fprintf('testInputNormal: The maximum error is %g\n',maxErr);
 % figure(3)
 % surf(Eplot)
+
+%  Plot the past energy function in a neighborhood of the origin
+figure(4)
+Eplot = zeros(N,N);
+for i=1:N
+  for j=1:N
+    z = [ zmin+(i-1)*dz; zmin+(j-1)*dz ];
+    Eplot(i,j) = kronPolyEval(vT,z,degree+1);
+  end
+end
+surf(Eplot)
+title('Past energy function in original coordinates')
+
+figure(5)
+Eplot = zeros(N,N);
+for i=1:N
+  for j=1:N
+    z = [ zmin+(i-1)*dz; zmin+(j-1)*dz ];
+    x = kronPolyEval(T,z,degree);
+    Eplot(i,j) = kronPolyEval(vT,x,degree+1);
+  end
+end
+surf(Eplot)
+title('Past energy function in transformed coordinates')

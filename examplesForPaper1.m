@@ -1,4 +1,7 @@
-%  A script to run the examples in arXiv:2209.07645
+%  A script to run the examples in Nonlinear Balanced Truncation:
+%  Part 1-Computing energy functions, Kramer, Gugercin, and Borggaard,
+%  arXiv:2209.07645
+
 setKroneckerToolsPath
 addpath('examples')
 addpath('utils')
@@ -10,8 +13,8 @@ addpath('utils')
 %  For Table 1, please use energyFunctionValidation in the tests directory.
 %[v,w] = runExample2(7,true,true,6);
 
-%%  runExample3 produces Tables II and III.
+%%  runExample3 produces Tables II, III, and IV.
 %runExample3
 
-%%  runExample4 produces Tables IV and V.
+%%  runExample4 produces Tables V and VI.
 runExample4

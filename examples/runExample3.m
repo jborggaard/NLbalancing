@@ -6,6 +6,8 @@
 %  The second uses a fixed system order and tests the accuracy of the
 %  energy function approximations as the degree increases.
 %
+%  We assume this is run from the main directory and paths are set there.
+%
 %  This script generates the tables found in Section IV.C. of the paper
 %    Nonlinear balanced truncation:  Part 1--Computing energy functions, 
 %    by Kramer, Gugercin, and Borggaard, arXiv:2209.07645.
@@ -13,7 +15,7 @@
 %  Part of the NLbalancing repository.
 %%
 
-eta =  0.9;
+eta =  0.9; 
 
 z_factor = 0.001;  % scale factor on the initial conditions.
                    % zInit = 0.5*sin(2*pi*x)^2 on (0,0.5) and 0 otherwise
