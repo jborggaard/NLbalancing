@@ -79,26 +79,8 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
   T{1} = R.'\V;
 
   if (degree>1)
-%    k = 2;
     vT3  = kroneckerRight(v{3}.',T{1});
-%     A = inv(T{1});
-%     AA = zeros(n^(k+1),n^(k+1));
-%     for i=1:n^k
-%       AA(n*i-1:n*i,n*i-1:n*i) = A;
-%     end
-%     for j=1:n
-%       for i=1:n^k
-%         row  = i+(j-1)*n^k;
-%         cols = 1+(i-1)*n:n+(i-1)*n;
-%         AA(row,cols) = AA(row,cols) + A(j,:);
-%       end
-%     end
-%     Tk = -AA\vT3.';
-%     T{k} = reshape(Tk,n,n^k);
-% 
-%     temp1 = T{k};
     T{2} = -0.5*T{1}*reshape(vT3,n,n^2);
-%    norm(T{2}-temp1)
   end
   
   if (degree>2)
@@ -108,7 +90,7 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
 
       % compute the remaining terms in the sum of vecs
       for j=3:k-1
-        TVT = TVT + vec(T{k-j+1}.'*V2*T{j});  % half of this work is redundant
+        TVT = TVT + vec(T{k-j+1}.'*V2*T{j});  % ~ half of this work is redundant
       end
 
       % compute the j=3 term
@@ -127,6 +109,12 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
       if (verbose)
         fprintf('The residual error for T{%d} is %g\n',k,...
                 norm( (kron(T{1}.',T{k}.')+kron(T{k}.',T{1}.'))*v{2} + term ) )
+        GG = (kron(T{1}.',T{k}.')+kron(T{k}.',T{1}.'))*v{2} + term;
+        zz = rand(n,1);
+        MM = GG.'*KroneckerPower(zz,k+1);
+
+        fprintf('... however, the residual error randomly multiplied\n')
+        fprintf('    by a Kronecker product term is %g\n',MM)
       end
     end
   end
