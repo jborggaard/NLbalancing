@@ -22,7 +22,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
 %
 %  Requires the following functions from the KroneckerTools repository:
 %      KroneckerSumSolver
-%      kronPolySymmetrize
+%      kronMonomialSymmetrize
 %      LyapProduct
 %
 %  Author: Jeff Borggaard, Virginia Tech
@@ -41,15 +41,21 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
     verbose = false;
   end
 
-  n = size(A,1);
-  m = size(B,2);
-
-  R = eye(m)/eta;
+  n = size(A,1);   % A should be n-by-n
+  m = size(B,2);   % B should be n-by-m
+  p = size(C,1);   % C should be p-by-n
 
   Acell = cell(1,d);
   for i=1:d
     Acell{i} = A.';
   end
+
+  % Create a vec function for readability
+  vec = @(X) X(:);
+
+
+  %% k=2 case
+  R = eye(m)/eta;
 
   if ( eta>0 )
     [W2] = icare(A,B,(C.'*C),R);
@@ -85,92 +91,41 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
   w2 = W2(:);
   w{2} = w2;
 
+  %% k=3 case
   if ( d>2 )
     b = -LyapProduct(N.',w2,2);
-    [w3] = KroneckerSumSolver(Acell(1:3),b,2,-3*eta*W2*(B*B.'));
+    W2BB = W2*(B*B.');
+    [w{3}] = KroneckerSumSolver(Acell(1:3),b,2,-3*eta*W2BB);
     
-    [w3] = kronPolySymmetrize(w3,n,3);
-
-    w{3} = w3;
+    [w{3}] = kronMonomialSymmetrize(w{3},n,3);
   end
   
+  %% k>3 cases (up to d)
+  BWk = cell(1,d-1);
   if ( d>3 )
-    W3 = reshape(w3,n,n^2);
-    W3BBW3 = (W3.'*B)*(B.'*W3);  % just for now...    new variables BW3, etc.
-    b = -LyapProduct(N.',w3,3) + 9*eta*W3BBW3(:)/4;
-    [w4] = KroneckerSumSolver(Acell(1:4),b,3,-4*eta*W2*(B*B.'));
 
-    [w4] = kronPolySymmetrize(w4,n,4);
-    
-    w{4} = w4;
+    for k=4:d
+      BWk{k-1} = B.'*reshape(w{k-1},n,n^(k-2));
+
+      b = -LyapProduct(N.',w{k-1},k-1);
+      
+      for i=3:(k+1)/2
+        j   = k+2-i;
+        tmp = BWk{i}.'*BWk{j};
+        b   = b + 0.25*eta*i*j*(vec(tmp) + vec(tmp.'));
+      end
+
+      if (mod(k,2)==0) % k is even
+        i   = (k+2)/2; 
+        j   = i;
+        tmp = BWk{i}.'*BWk{j};
+        b   = b + 0.25*eta*i*j*vec(tmp);
+      end
+
+      [w{k}] = KroneckerSumSolver(Acell(1:k),b,k-1,-k*eta*W2*(B*B.'));
+
+      [w{k}] = kronMonomialSymmetrize(w{k},n,k);
+    end
   end
 
-  if ( d>4 )
-    W4 = reshape(w4,n,n^3);
-    W3BBW4 = (W3.'*B)*(B.'*W4);
-    W4BBW3 = W3BBW4.';
-    b = -LyapProduct(N.',w4,4) + 12*eta*W3BBW4(:)/4 + ...
-                                 12*eta*W4BBW3(:)/4;
-    [w5] = KroneckerSumSolver(Acell(1:5),b,4,-5*eta*W2*(B*B.'));
-
-    [w5] = kronPolySymmetrize(w5,n,5);
-    
-    w{5} = w5;
-  end
-
-  if ( d>5 )
-    W5 = reshape(w5,n,n^4);
-    W3BBW5 = (W3.'*B)*(B.'*W5);
-    W4BBW4 = (W4.'*B)*(B.'*W4);
-    W5BBW3 = W3BBW5.';
-    b = -LyapProduct(N.',w5,5) + 15*eta*W3BBW5(:)/4 + ...
-                                 16*eta*W4BBW4(:)/4 + ...
-                                 15*eta*W5BBW3(:)/4;
-    [w6] = KroneckerSumSolver(Acell(1:6),b,5,-6*eta*W2*(B*B.'));
-
-    [w6] = kronPolySymmetrize(w6,n,6);
-    
-    w{6} = w6;
-  end
-
-  if ( d>6 )
-    W6 = reshape(w6,n,n^5);
-    W3BBW6 = (W3.'*B)*(B.'*W6);
-    W4BBW5 = (W4.'*B)*(B.'*W5);
-    W5BBW4 = W4BBW5.';
-    W6BBW3 = W3BBW6.';
-    b = -LyapProduct(N.',w6,6) + 18*eta*W3BBW6(:)/4 + ...
-                                 20*eta*W4BBW5(:)/4 + ...
-                                 20*eta*W5BBW4(:)/4 + ...
-                                 18*eta*W6BBW3(:)/4;
-    [w7] = KroneckerSumSolver(Acell(1:7),b,6,-7*eta*W2*(B*B.'));
-
-    [w7] = kronPolySymmetrize(w7,n,7);
-    
-    w{7} = w7;
-  end
-  
-  if ( d>7 )
-    W7 = reshape(w7,n,n^6);
-    W3BBW7 = (W3.'*B)*(B.'*W7);
-    W4BBW6 = (W4.'*B)*(B.'*W6);
-    W5BBW5 = (W5.'*B)*(B.'*W5);
-    W6BBW4 = W4BBW6.';
-    W7BBW3 = W3BBW7.';
-    b = -LyapProduct(N.',w7,7) + 21*eta*W3BBW7(:)/4 + ...
-                                 24*eta*W4BBW6(:)/4 + ...
-                                 25*eta*W5BBW5(:)/4 + ...
-                                 24*eta*W6BBW4(:)/4 + ...
-                                 21*eta*W7BBW3(:)/4;
-    [w8] = KroneckerSumSolver(Acell(1:8),b,7,-8*eta*W2*(B*B.'));
-
-    % KronPolySymmetrize does not currently handle 8th degree coefficients
-    % so we simply return the unsymmetrized coefficients.
-
-    w{8} = w8;
-  end
-  
-  if ( d>8 )
-    warning('approxFutureEnergy: monomial terms past degree 8 are not computed')
-  end
 end

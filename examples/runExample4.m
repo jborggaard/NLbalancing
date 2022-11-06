@@ -1,7 +1,7 @@
 %  example KS, feedback control of the discretized periodic 
 %  Kuramoto-Sivashinsky equations using distributed control.
 %
-%  These values match those in IV.D of the reference
+%  These values match those in Section IV.D of the reference
 %
 %  Nonlinear balanced trunction: Part 1-Computing energy functions,
 %  Kramer, Gugercin, and Borggaard, arXiv.
@@ -35,7 +35,7 @@ for n=[8,16,32]   % number of elements, the actual number of states is 2*n
   fprintf('%12.6e \\\\ \n',wzInit)
 end
 
-% %%
+%%
 nTest = 1;
 degree = 3;
 
@@ -71,7 +71,7 @@ for degree=[2,3,4,5,6]  % only the last one is needed, but use this for timing
   tt=toc/2^(8-degree);
   for d=2:degree, v{d} = v{d}.'; end
   vzInit = 0.5*kronPolyEval(v,zInit,degree);
-  fprintf('%12.6e ',vzInit)
+  fprintf('%13.7e ',vzInit)
   fprintf('(%8.2e) & ',tt)
 
   tic; 
@@ -81,7 +81,7 @@ for degree=[2,3,4,5,6]  % only the last one is needed, but use this for timing
   tt=toc/2^(8-degree);
   for d=2:degree, w{d} = w{d}.'; end
   wzInit = 0.5*kronPolyEval(w,zInit,degree);
-  fprintf('%12.6e ' ,wzInit)
+  fprintf('%13.7e ' ,wzInit)
   fprintf('(%8.2e) \\\\ \n',tt)
 end
 save('KSenergyFcns.mat')

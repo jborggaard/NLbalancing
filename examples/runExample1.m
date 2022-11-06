@@ -1,4 +1,4 @@
-function [v,w] = Example1()
+function [v,w] = runExample1()
 %runExample1 Runs the first example from the paper
 %   Usage:  [] = runExaple1()
 %
