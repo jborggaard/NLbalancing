@@ -18,6 +18,10 @@ z_factor = 0.01;  % scale factor on the initial conditions.
 %%
 %  Computational performance of the energy function approximations.
 %  Since the initial times are so short, we average nTest times
+%
+%  This builds TABLE V
+%
+fprintf('Table V Data\n')
 nTest = 10;
 degree = 3;
 
@@ -57,6 +61,10 @@ fprintf('\n\n')
 %%
 %  Test convergence of the energy function at a "point" with increasing
 %  degree...
+%
+%  This builds TABLE VI
+%
+fprintf('Table VI Data\n')
 
 n=8;  % actual system size is double this
 [A,B,C,N,zInit] = getSystem4(n,m,p,1/L^2);
