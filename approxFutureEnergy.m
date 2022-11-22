@@ -45,11 +45,6 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
   m = size(B,2);   % B should be n-by-m
   p = size(C,1);   % C should be p-by-n
 
-  Acell = cell(1,d);
-  for i=1:d
-    Acell{i} = A.';
-  end
-
   % Create a vec function for readability
   vec = @(X) X(:);
 
@@ -92,10 +87,15 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
   w{2} = w2;
 
   %% k=3 case
-  if ( d>2 )
-    b = -LyapProduct(N.',w2,2);
+  if ( d>2 ) % set up the generalized Lyapunov solver
     W2BB = W2*(B*B.');
-    [w{3}] = KroneckerSumSolver(Acell(1:3),b,2,-3*eta*W2BB);
+    Acell = cell(1,d);
+    for i=1:d
+      Acell{i} = A.'-eta*W2BB;
+    end
+
+    b = -LyapProduct(N.',w2,2);
+    [w{3}] = KroneckerSumSolver(Acell(1:3),b,3);
     
     [w{3}] = kronMonomialSymmetrize(w{3},n,3);
   end
@@ -122,7 +122,7 @@ function [w] = approxFutureEnergy(A,N,B,C,eta,d,verbose)
         b   = b + 0.25*eta*i*j*vec(tmp);
       end
 
-      [w{k}] = KroneckerSumSolver(Acell(1:k),b,k-1,-k*eta*W2*(B*B.'));
+      [w{k}] = KroneckerSumSolver(Acell(1:k),b,k);
 
       [w{k}] = kronMonomialSymmetrize(w{k},n,k);
     end

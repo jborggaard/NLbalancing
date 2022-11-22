@@ -14,7 +14,7 @@ addpath('utils')
 %[v,w] = runExample2(7,true,true,6);
 
 %%  runExample3 produces Tables II, III, and IV.
-%runExample3
+runExample3
 
 %%  runExample4 produces Tables V and VI.
-runExample4
+%runExample4

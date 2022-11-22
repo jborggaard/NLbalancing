@@ -81,6 +81,9 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
   if (degree>1)
     vT3  = kroneckerRight(v{3}.',T{1});
     T{2} = -0.5*T{1}*reshape(vT3,n,n^2);
+    for i=1:n
+      T{2}(i,:) = kronMonomialSymmetrize(T{2}(i,:),n,2);
+    end
   end
   
   if (degree>2)
@@ -105,6 +108,9 @@ function [sigma,T] = inputNormalTransformation(v,w,degree,verbose)
       term = TVT + Tv;
       
       T{k} = -0.5*T{1}*reshape(term,n^k,n).';
+      for i=1:n
+        T{k}(i,:) = kronMonomialSymmetrize(T{k}(i,:),n,k);
+      end
 
       if (verbose)
         fprintf('The residual error for T{%d} is %g\n',k,...

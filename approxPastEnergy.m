@@ -113,10 +113,15 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
 
   %% k=3 case
   if ( d>2 )
+    % set up the generalized Lyapunov solver
     V2BB = V2*(B*B.');
+    Acell = cell(1,d);
+    for i=1:d
+      Acell{i} = A.'+V2BB;
+    end
   
     b = -LyapProduct(N.',v2,2);
-    [v{3}] = KroneckerSumSolver(Acell(1:3),b,2,3*V2BB);
+    [v{3}] = KroneckerSumSolver(Acell(1:3),b,3);
 
     [v{3}] = kronMonomialSymmetrize(v{3},n,3);
   end
@@ -143,7 +148,7 @@ function [v] = approxPastEnergy(A,N,B,C,eta,d,verbose)
         b   = b - 0.25*i*j*vec(tmp);
       end
 
-      [v{k}] = KroneckerSumSolver(Acell(1:k),b,k-1,k*V2BB);
+      [v{k}] = KroneckerSumSolver(Acell(1:k),b,k);
 
       [v{k}] = kronMonomialSymmetrize(v{k},n,k);
     end

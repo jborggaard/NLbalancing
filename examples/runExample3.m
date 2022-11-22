@@ -33,6 +33,7 @@ alpha   = 0.0;     % alpha = 1.0, not controllable at n=8
 %
 %  This builds TABLE II
 %
+fprintf('Table II Data\n')
 nTest = 10;
 degree = 3;
 
@@ -72,16 +73,42 @@ end
 fprintf('\n\n')
 
 %%
-%  Test convergence of the energy function at a "point" z_factor*zInit
-%  with increasing degree...
+%  Computational performance of the energy function approximations.
+%  Since the initial times are so short, we average nTest times
 %
 %  This builds TABLE III
 %
+fprintf('Table III Data\n')
+nTest = 10;
+degree = 4;
 
+for n=[8,16,32,64,128]
+  fprintf('%d & ',n)
+  [A,B,C,N,zInit] = getSystem3(n,m,p,epsilon,alpha);
+  zInit = z_factor*zInit;
+
+  tic; for i=1:nTest, [w] = approxFutureEnergy(full(A),N,B,C,eta,degree); end, tt=toc/nTest;
+  fprintf('%10.4e & ',length(w{degree}))
+  fprintf('%8.2e & ',tt)
+
+  for d=2:degree, w{d} = w{d}.'; end
+  wzInit = 0.5*kronPolyEval(w,zInit,degree);
+  fprintf('%12.6e \\\\ \n',wzInit)
+end
+
+fprintf('\n\n')
+
+%%
+%  Test convergence of the energy function at a "point" z_factor*zInit
+%  with increasing degree...
+%
+%  This builds TABLE IV
+%
+fprintf('Table IV Data\n')
 n=8;
 [A,B,C,N,zInit] = getSystem3(n,m,p,epsilon,alpha);
 zInit = z_factor*zInit;
-for degree=[2,3,4,5,6]
+for degree=[2,3,4,5,6,7,8]
   fprintf('%d & ',degree)
 
   [v] = approxPastEnergy(full(A),N,B,C,eta,degree);
