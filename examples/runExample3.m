@@ -17,7 +17,7 @@
 
 eta =  0.9; 
 
-z_factor = 0.001;  % scale factor on the initial conditions.
+z_factor = 0.008;  % scale factor on the initial conditions.
                    % zInit = 0.5*sin(2*pi*x)^2 on (0,0.5) and 0 otherwise
                    % so z_factor = 0.001 matches the initial condition in IV.C.
 

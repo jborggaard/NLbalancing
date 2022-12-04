@@ -13,7 +13,7 @@ m = 5;
 p = 2;
 L = 13.0291;
 
-z_factor = 0.01;  % scale factor on the initial conditions.
+z_factor = 0.1;  % scale factor on the initial conditions.
   
 %%
 %  Computational performance of the energy function approximations.
