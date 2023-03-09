@@ -52,15 +52,15 @@ if (nargin < 7)
 end
 
 % Create pointer/shortcuts for dynamical system polynomial coefficients
-if ismatrix(g)
+if iscell(g)
+  % QB or polynomial input balancing
+  B = g{1};
+  l = length(g) - 1;
+else
   % Will reduce to Jeff's original code
   B = g;
   l = 0;
   g = {B};
-else
-  % QB or polynomial input balancing
-  B = g{1};
-  l = length(g) - 1;
 end
 
 n = size(A, 1); % A should be n-by-n
