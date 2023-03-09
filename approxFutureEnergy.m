@@ -109,8 +109,8 @@ w{2} = vec(W2);
 
 %% k=3 case
 if (d > 2)
-  NaWb = cell(2 * l + 1, d - 1); % Pre-compute N_a.'*W_b, etc for all the a,b we need
-  NaWb{1, 2} = B.' * W2;
+  GaWb = cell(2 * l + 1, d - 1); % Pre-compute N_a.'*W_b, etc for all the a,b we need
+  GaWb{1, 2} = B.' * W2;
   Im = speye(m);
   % set up the generalized Lyapunov solver
   [Acell{1:d}] = deal(A.' - eta * W2 * (B * B.'));
@@ -118,8 +118,8 @@ if (d > 2)
   b = -LyapProduct(N.', w{2}, 2);
 
   if l > 0 % New for QB/polynomial input
-    NaWb{2, 2} = g{2}.' * W2;
-    b = b + 2 * eta * kron(speye(n ^ 3), vec(Im).') * vec(kron(NaWb{2, 2}, NaWb{1, 2}));
+    GaWb{2, 2} = g{2}.' * W2;
+    b = b + 2 * eta * kron(speye(n ^ 3), vec(Im).') * vec(kron(GaWb{2, 2}, GaWb{1, 2}));
   end
 
   [w{3}] = KroneckerSumSolver(Acell(1:3), b, 3); % Solve Ax=b for k=3
@@ -127,21 +127,21 @@ if (d > 2)
 
   %% k>3 cases (up to d)
   for k = 4:d
-    NaWb{1, k - 1} = B.' * reshape(w{k - 1}, n, n ^ (k - 2));
+    GaWb{1, k - 1} = B.' * reshape(w{k - 1}, n, n ^ (k - 2));
 
     b = -LyapProduct(N.', w{k - 1}, k - 1); % Pre-compue all the L(N') terms
 
     % Now add all the terms from the 'B' sum by looping through the i and j
     for i = 3:(k + 1) / 2 % i+j=k+2
       j = k + 2 - i;
-      tmp = NaWb{1, i}.' * NaWb{1, j};
+      tmp = GaWb{1, i}.' * GaWb{1, j};
       b = b + 0.25 * eta * i * j * (vec(tmp) + vec(tmp.'));
     end
 
     if ~mod(k, 2) % k is even
       i = (k + 2) / 2;
       j = i;
-      tmp = NaWb{1, i}.' * NaWb{1, j};
+      tmp = GaWb{1, i}.' * GaWb{1, j};
       b = b + 0.25 * eta * i * j * vec(tmp);
     end
 
@@ -149,7 +149,7 @@ if (d > 2)
     [g{l + 2:2 * l + 1}] = deal(0); % Need an extra space in g because of NaVb indexing
 
     for o = 1:2 * l
-      NaWb{o + 1, k - 1} = g{o + 1}.' * reshape(w{k - 1}, n, n ^ (k - 2));
+      GaWb{o + 1, k - 1} = g{o + 1}.' * reshape(w{k - 1}, n, n ^ (k - 2));
 
       for p = max(0, o - l):min(o, l)
 
@@ -157,7 +157,7 @@ if (d > 2)
           q = o - p;
           j = k - o - i + 2;
           tmp = kron(speye(n ^ p), vec(Im).') ...
-            * kron(vec(NaWb{q + 1, j}).', kron(NaWb{p + 1, i}, Im)) ...
+            * kron(vec(GaWb{q + 1, j}).', kron(GaWb{p + 1, i}, Im)) ...
             * kron(speye(n ^ (j - 1)), kron(perfectShuffle(n ^ (i - 1), n ^ q * m), Im)) ...
             * kron(speye(n ^ (k - p)), vec(Im));
           b = b + 0.25 * eta * i * j * vec(tmp);
