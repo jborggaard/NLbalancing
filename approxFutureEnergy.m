@@ -109,7 +109,7 @@ w{2} = vec(W2);
 
 %% k=3 case
 if (d > 2)
-  GaWb = cell(2 * l + 1, d - 1); % Pre-compute N_a.'*W_b, etc for all the a,b we need
+  GaWb = cell(2 * l + 1, d - 1); % Pre-compute G_a.'*W_b, etc for all the a,b we need
   GaWb{1, 2} = B.' * W2;
   Im = speye(m);
   % set up the generalized Lyapunov solver

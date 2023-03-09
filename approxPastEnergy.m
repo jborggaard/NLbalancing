@@ -134,7 +134,7 @@ v{2} = vec(V2);
 
 %% k=3 case
 if (d > 2)
-  GaVb = cell(2 * l + 1, d - 1); % Pre-compute N_a.'*V_b, etc for all the a,b we need
+  GaVb = cell(2 * l + 1, d - 1); % Pre-compute G_a.'*V_b, etc for all the a,b we need
   GaVb{1, 2} = B.' * V2; % Recall g{1} = B
   % set up the generalized Lyapunov solver
   [Acell{1:d}] = deal(A.' + V2 * (B * B.'));
