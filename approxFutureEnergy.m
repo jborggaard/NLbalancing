@@ -111,13 +111,13 @@ w{2} = vec(W2);
 if (d > 2)
   GaWb = cell(2 * l + 1, d - 1); % Pre-compute G_a.'*W_b, etc for all the a,b we need
   GaWb{1, 2} = B.' * W2;
-  Im = speye(m);
   % set up the generalized Lyapunov solver
   [Acell{1:d}] = deal(A.' - eta * W2 * (B * B.'));
 
   b = -LyapProduct(N.', w{2}, 2);
 
   if l > 0 % New for QB/polynomial input
+    Im = speye(m);
     GaWb{2, 2} = g{2}.' * W2;
     b = b + 2 * eta * kron(speye(n ^ 3), vec(Im).') * vec(kron(GaWb{2, 2}, GaWb{1, 2}));
   end
