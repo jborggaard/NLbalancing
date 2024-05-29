@@ -48,7 +48,7 @@ function [v,w] = runExample2(degree,plotEnergy,plotBalancing,balancingDegree)
   if ( plotBalancing )
     dataRange = 0.35; %6.0
   else
-    dataRange = 0.35; %0.75;
+    dataRange = 1.0; %0.35; %0.75;
   end
   
   [A,B,C,N] = getSystem2();

@@ -5,7 +5,7 @@ function [w] = approxFutureEnergy(A, N, g, C, eta, d, verbose)
 %  w = approxFutureEnergy(A,N,g,C,eta,d,verbose)
 %
 %  where 'verbose' is an optional argument. If the system has a constant
-%  input vector field Bu, the matrix B may be passes in place of a cell
+%  input vector field Bu, the matrix B may be passed in place of a cell
 %  array 'g'.The cell array 'g' should be g{1} = B = G_0, g{2} = G1, g{3} = G2 ...
 %
 %  Computes a degree d polynomial approximation to the future energy function

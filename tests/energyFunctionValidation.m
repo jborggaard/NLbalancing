@@ -40,9 +40,10 @@ switch (testCase)
 
     feedbackDegree = 7;  % degree of energy function approximation for 
                          % defining the control input.
-
-    analyticSolutionFEF = x0(1)^2/4 - x0(1)*x0(2)^2/6 + 3*x0(1)*x0(2)/4 + ...
-                          x0(2)^4/24 - 11*x0(2)^3/26 + 5*x0(2)^2/8;
+    
+    % requires eta=0
+    analyticSolutionFEF = (5*x0(2)^2)/8 - (11*x0(2)^3)/36 + x0(2)^4/24 + ...
+                          (3*x0(1)*x0(2))/4 - (x0(1)*x0(2)^2)/6 + x0(1)^2/4;
     fprintf('For example 2, the future energy function is %12.8e\n',...
             analyticSolutionFEF)
   case 3
